@@ -7,7 +7,8 @@ import Head from "next/head";
 import createWorkerTransport from "../components/transports/createWorkerTransport";
 import { Button } from "../components/Button";
 import { Toolbar } from "../components/Toolbar";
-import defaults from "../components/Defaults";
+// import defaults from "../components/Defaults";
+import reanimated from "../components/Reanimated";
 import React from "react";
 
 const INITIAL_CODE_CHANGES_DELAY = 500;
@@ -18,20 +19,27 @@ const css = (s) => s;
 
 export default function Home() {
 	const webPreviewRef = useRef(null);
-	const [snack] = useState(
-		() =>
-			new Snack({
-				...defaults,
-				disabled: !process.browser,
-				codeChangesDelay: INITIAL_CODE_CHANGES_DELAY,
-				verbose: VERBOSE,
-				webPreviewRef: process.browser ? webPreviewRef : undefined,
-				// Optionally you can run the transports inside a web-worker.
-				// Encoding data messages for large apps might take several milliseconds
-				// and can cause stutter when executed often.
-				...(USE_WORKERS ? { createTransport: createWorkerTransport } : {}),
-			})
-	);
+
+	const snackInstance = new Snack({
+		...reanimated,
+		disabled: !process.browser,
+		codeChangesDelay: INITIAL_CODE_CHANGES_DELAY,
+		verbose: VERBOSE,
+		webPreviewRef: process.browser ? webPreviewRef : undefined,
+		// Optionally you can run the transports inside a web-worker.
+		// Encoding data messages for large apps might take several milliseconds
+		// and can cause stutter when executed often.
+		...(USE_WORKERS ? { createTransport: createWorkerTransport } : {}),
+		// dependencies: {
+		// 	"string-width": "7.2.0",
+		// },
+	});
+
+	snackInstance.updateDependencies({
+		"@oxygen/native": "*",
+	});
+
+	const [snack] = useState(() => snackInstance);
 	const [snackState, setSnackState] = useState(snack.getState());
 	const [isSaving, setIsSaving] = useState(false);
 	const [isDownloading, setIsDownloading] = useState(false);
@@ -67,15 +75,15 @@ export default function Home() {
 	} = snackState;
 
 	return (
-		<div className={css(styles.container)}>
+		<div style={css(styles.container)}>
 			<Head>
 				<title>Snack SDK Example</title>
 				<meta name="description" content="Snack SDK Example App" />
 			</Head>
-			<div className={css(styles.left)}>
+			<div style={css(styles.left)}>
 				<Toolbar title="Code" />
 				<textarea
-					className={css(styles.code)}
+					style={css(styles.code)}
 					value={files["App.js"].contents}
 					onChange={(event) =>
 						snack.updateFiles({
@@ -88,17 +96,17 @@ export default function Home() {
 				/>
 				<p>Open the Developer Console of your Browser to view logs.</p>
 			</div>
-			<div className={css(styles.preview)}>
+			<div style={css(styles.preview)}>
 				<Toolbar title="Preview" />
-				<div className={css(styles.previewContainer)}>
+				<div style={css(styles.previewContainer)}>
 					<iframe
-						className={css(styles.previewFrame)}
+						style={css(styles.previewFrame)}
 						ref={(c) => (webPreviewRef.current = c?.contentWindow ?? null)}
 						src={isClientReady ? webPreviewURL : undefined}
 						allow="geolocation; camera; microphone"
 					/>
 					{isClientReady && !webPreviewURL && (
-						<div className={css(styles.previewNotSupported)}>
+						<div style={css(styles.previewNotSupported)}>
 							<label>
 								Set the SDK Version to 40.0.0 or higher to use Web preview
 							</label>
@@ -106,8 +114,8 @@ export default function Home() {
 					)}
 				</div>
 			</div>
-			<div className={css(styles.right)}>
-				<div className={css(styles.settingsContainer)}>
+			<div style={css(styles.right)}>
+				<div style={css(styles.settingsContainer)}>
 					<Toolbar>
 						<Button
 							style={styles.button}
@@ -141,7 +149,7 @@ export default function Home() {
 							}}
 						/>
 					</Toolbar>
-					<div className={css(styles.settingsContent)}>
+					<div style={css(styles.settingsContent)}>
 						<label>Name</label>
 						<input
 							type="text"
@@ -167,14 +175,14 @@ export default function Home() {
 						</select>
 					</div>
 				</div>
-				<div className={css(styles.onlineContainer)}>
+				<div style={css(styles.onlineContainer)}>
 					<Toolbar title="Connections">
 						<Button
 							label={online ? "Go Offline" : "Go Online"}
 							onClick={() => snack.setOnline(!online)}
 						/>
 					</Toolbar>
-					<div className={css(styles.onlineContent)}>
+					<div style={css(styles.onlineContent)}>
 						<label>Device Id</label>
 						<input
 							type="text"
@@ -201,7 +209,7 @@ export default function Home() {
 							/>
 						) : undefined}
 						<label>{`Status: ${online ? "Online" : "Offline"}`}</label>
-						{online ? <QRCode className={css(styles.qrcode)} value={url} /> : undefined}
+						{online ? <QRCode style={css(styles.qrcode)} value={url} /> : undefined}
 						{online ? <a href={url}>{url}</a> : undefined}
 						{online ? <label>{`Online name: ${onlineName}`}</label> : undefined}
 						{online ? (

@@ -6,6 +6,9 @@ const defaults = {
 			contents: `import React from 'react';
 import { Text, View, StyleSheet, Image } from 'react-native';
 import Constants from 'expo-constants';
+import rrq from 'react-native-gesture-handler';
+
+console.log("rrq --> ", rrq);
 
 export default () => {
   return (
@@ -62,6 +65,8 @@ const styles = StyleSheet.create({
 		"expo-av": { version: "*" },
 		"expo-font": { version: "*" },
 		"expo-app-loading": { version: "*" },
+		"react-native-reanimated": { version: "*" },
+		"react-native-gesture-handler": { version: "*" },
 	},
 };
 
